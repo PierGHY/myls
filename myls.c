@@ -142,9 +142,10 @@ int my_d(char *str, char *f_word) {
     if (f_word[0] == '-') {
         my_putstr(".");
     }
-    else 
+    else { 
         my_putstr(f_word);
         my_putstr("\n");
+    }
 }
 
 
@@ -153,6 +154,7 @@ int my_r(char *str, char *f_word){
     DIR *dir;
     struct dirent *dp;
     char * file_name;
+    char * reverse;
 
     dir = opendir(".");
 
@@ -161,7 +163,7 @@ int my_r(char *str, char *f_word){
         if (file_name[0] != '.') {
             my_putstr(file_name);
             my_putstr("\n");
-         }
+        }
     }
     closedir(dir);
 }
