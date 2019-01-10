@@ -5,18 +5,7 @@
 ** a
 */
 
-#include <sys/types.h>
-#include <dirent.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <sys/sysmacros.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <pwd.h>
-#include <grp.h>
-
-
+#include "my.h"
 
 void my_putchar(char c)
 {
@@ -81,7 +70,7 @@ int myls(char *str, char *f_word)
                     my_d(str, f_word);
                     break;
                 case 'r':
-                    my_r(str);
+                    my_r(str, f_word);
                     break;
                 case 't':
                     my_tt(str);
@@ -106,7 +95,7 @@ void ls(void) {
         if (file_name[0] != '.') {
             my_putstr(file_name);
             my_putstr("\n");
-         }
+        }
     }
     closedir(dir);
 }
@@ -120,14 +109,31 @@ int my_l(char *str, char *f_word) {
     struct passwd *pw;
     struct group *gp;
     DIR *dir;
+    DIR *dir2;
     struct dirent *dp;
+    struct dirent *dp2;
     char * file_name;
+    char * file_name2;
+    int blocks = 0;
 
     dir = opendir(".");
-
-    if (f_word[0] != '-')
+    dir2 = opendir(".");
+    
+    while ((dp2=readdir(dir2)) != NULL) {
+            file_name2 = dp2->d_name;
+            stat(file_name2, &st);  
+            if (file_name2[0] != '.')
+                blocks = blocks + st.st_blocks;
+    }
+    blocks = blocks / 2;
+    closedir(dir2);
+    if (f_word[0] != '-') {
         displayl(st, pw, gp, f_word);
-    else { 
+    }
+    else {
+        my_putstr("total ");
+        my_put_nbr(blocks);
+        my_putstr("\n");
         while ((dp=readdir(dir)) != NULL) {
             file_name = dp->d_name;
             if (file_name[0] != '.')
@@ -142,7 +148,7 @@ int my_d(char *str, char *f_word) {
     if (f_word[0] == '-') {
         my_putstr(".");
     }
-    else { 
+    else {
         my_putstr(f_word);
         my_putstr("\n");
     }
@@ -221,7 +227,9 @@ int my_tt(char *str) {
 
 int tri(struct dirent *dp, char * file_name, DIR *dir) {
     struct stat st;
-    int hr = 0 ;    
+    int hr = 0;
+    char * str;
+
     while ((dp=readdir(dir)) != NULL) {
         file_name = dp->d_name;
         
