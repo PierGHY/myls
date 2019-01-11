@@ -95,10 +95,14 @@ void ls(int ac, char *av) {
     DIR *dir;
     struct dirent *dp;
     char * file_name;
-
-    //if ()
-    dir = opendir(".");
-    if (ac == 1) {
+    struct stat st;
+    stat(av, &st);
+    
+    if (S_ISDIR(st.st_mode))
+        dir = opendir(av);
+    else
+        dir = opendir(".");
+    if (ac == 1 || S_ISDIR(st.st_mode)) {
         while ((dp=readdir(dir)) != NULL) {
             file_name = dp->d_name;
             if (file_name[0] != '.') {
