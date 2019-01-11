@@ -42,6 +42,14 @@ void my_putstr(char const *str)
     }
 }
 
+int my_strlen(char const *str)
+{
+    int i = 0;
+    while(str[i] != '\0')
+        i = i + 1;
+    return (i);
+}
+
 void my_putstrdate(char const *str)
 {
     int i = 3;
@@ -83,22 +91,30 @@ int myls(char *str, char *f_word)
     }
 }
 
-void ls(void) {
+void ls(int ac, char *av) {
     DIR *dir;
     struct dirent *dp;
     char * file_name;
 
+    //if ()
     dir = opendir(".");
-
-    while ((dp=readdir(dir)) != NULL) {
-        file_name = dp->d_name;
-        if (file_name[0] != '.') {
-            my_putstr(file_name);
-            my_putstr("\n");
+    if (ac == 1) {
+        while ((dp=readdir(dir)) != NULL) {
+            file_name = dp->d_name;
+            if (file_name[0] != '.') {
+                my_putstr(file_name);
+                my_putstr("\n");
+            }
         }
+    }
+    else {
+        my_putstr(av);
+        my_putstr("\n");
     }
     closedir(dir);
 }
+
+
 /*1
 int my_bigr()
 
@@ -115,9 +131,17 @@ int my_l(char *str, char *f_word) {
     char * file_name;
     char * file_name2;
     int blocks = 0;
+    stat(f_word, &st);
 
-    dir = opendir(".");
-    dir2 = opendir(".");
+    if(S_ISDIR(st.st_mode)) {
+        dir = opendir(f_word);
+        dir2 = opendir(f_word);
+        printf("f-word => %s", f_word);
+    }
+    else {
+        dir = opendir(".");
+        dir2 = opendir(".");
+    }
     
     while ((dp2=readdir(dir2)) != NULL) {
             file_name2 = dp2->d_name;
@@ -160,7 +184,9 @@ int my_r(char *str, char *f_word){
     DIR *dir;
     struct dirent *dp;
     char * file_name;
-    char * reverse;
+    int count;
+    int nb;
+  
 
     dir = opendir(".");
 
@@ -169,10 +195,53 @@ int my_r(char *str, char *f_word){
         if (file_name[0] != '.') {
             my_putstr(file_name);
             my_putstr("\n");
+            count = count + my_strlen(file_name);
+            nb = nb + 1;
         }
     }
+    //load_2d_arr_from_file(count, nb, file_name);
     closedir(dir);
 }
+
+/*
+void load_2d_arr_from_file(int count, int nb, char * file_name)
+{
+    struct stat size;
+
+    file_name = malloc(sizeof(char) * (count));
+
+    char **str = malloc(sizeof(char *) * (my_strlen(file_name)));
+    int i = 0;
+
+    while (i <= my_strlen(file_name)) {
+        str[i] = malloc(sizeof(char) * (nb));
+        i = i + 1;
+    }
+    disp(file_name, str, nb);
+}
+
+void disp(char * file_name, char ** str, int nb)
+{
+    int i = 0;
+    int j = 0;
+    int k = 0;
+
+    while (i < my_strlen(file_name)) {
+        while (j <= nb) {
+            str[i][j] = file_name[k];
+            j = j + 1;
+            k = k + 1;
+        }
+        j = 0;
+        i = i + 1;
+    }
+    for (int h = 0; h < my_strlen(file_name); h++) {
+        for (int z = 0; z < nb; z++)
+            my_putchar(str[h][z]);
+    }
+    return (str);
+}
+*/
 
 int displayl(struct stat st, struct passwd *pw, struct group *gp, char * f_word ) {
     int i = 0;
@@ -246,8 +315,8 @@ int main(int ac, char **av)
 {
     int i = 0;
     
-    if(ac == 1) {
-        ls();
+    if(ac == 1 || av[1][0] != '-') {
+        ls(ac, av[ac - 1]);
     }
     else {
         while (i != ac) {
