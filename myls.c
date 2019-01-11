@@ -62,15 +62,9 @@ void my_putstrdate(char const *str)
 
 int myls(char *str, char *f_word) 
 {
-    int i = 1;
-
-    //printf("f_word => %s", f_word);
     if(str[0] == '-') {
-        while (str[i] != '\0') { 
+        for (int i = 1; str[i] != '\0'; i++) { 
             switch(str[i]) {
-                case 'R':
-                    //my_bigr(str);
-                    break;
                 case 'l':
                     my_l(str, f_word);
                     break;
@@ -84,9 +78,8 @@ int myls(char *str, char *f_word)
                     my_tt(str);
                     break;
                 default:
-                    return(84);
+                    exit (84);
             }
-            i = i + 1;
         }
     }
 }
@@ -98,27 +91,31 @@ void ls(int ac, char *av) {
     struct stat st;
     stat(av, &st);
     
-    if (S_ISDIR(st.st_mode))
+    if (S_ISDIR(st.st_mode)){
         dir = opendir(av);
-    else
+        if (opendir(av) == NULL)
+            return(84);
+    }else
         dir = opendir(".");
     if (ac == 1 || S_ISDIR(st.st_mode)) {
-        while ((dp=readdir(dir)) != NULL) {
-            file_name = dp->d_name;
-            if (file_name[0] != '.') {
-                my_putstr(file_name);
-                my_putstr("\n");
-            }
-        }
-    }
-    else {
+        term_disp( dp, file_name, dir);
+    }else {
         my_putstr(av);
         my_putstr("\n");
     }
     closedir(dir);
 }
 
-
+int term_disp(struct dirent *dp, char * file_name, DIR *dir)
+{
+    while ((dp=readdir(dir)) != NULL) {
+        file_name = dp->d_name;
+        if (file_name[0] != '.') {
+            my_putstr(file_name);
+            my_putstr("\n");
+        }
+    }
+}
 /*1
 int my_bigr()
 
@@ -140,8 +137,7 @@ int my_l(char *str, char *f_word) {
     if(S_ISDIR(st.st_mode)) {
         dir = opendir(f_word);
         dir2 = opendir(f_word);
-    }
-    else {
+    }else {
         dir = opendir(".");
         dir2 = opendir(".");
     }
@@ -168,12 +164,16 @@ int my_l(char *str, char *f_word) {
         }
         closedir(dir);
     }
+}
 
+int my_l2(void)
+{
 }
 
 int my_d(char *str, char *f_word) {
     if (f_word[0] == '-') {
         my_putstr(".");
+        my_putstr("\n");
     }
     else {
         my_putstr(f_word);
@@ -181,15 +181,12 @@ int my_d(char *str, char *f_word) {
     }
 }
 
-
-
 int my_r(char *str, char *f_word){
     DIR *dir;
     struct dirent *dp;
     char * file_name;
     int count;
     int nb;
-  
 
     dir = opendir(".");
 
@@ -202,7 +199,6 @@ int my_r(char *str, char *f_word){
             nb = nb + 1;
         }
     }
-    //load_2d_arr_from_file(count, nb, file_name);
     closedir(dir);
 }
 
@@ -246,12 +242,32 @@ void disp(char * file_name, char ** str, int nb)
 }
 */
 
-int displayl(struct stat st, struct passwd *pw, struct group *gp, char * f_word ) {
+int displayl(struct stat st, struct passwd *pw, 
+struct group *gp, char * f_word ) 
+{
     int i = 0;
     int a = 0;
     char * hours;
     stat(f_word, &st);
+    right(st, i);
+    if ((pw = getpwuid(st.st_uid)) != NULL)
+        my_putstr(pw->pw_name);
+    if ((gp = getgrgid(st.st_gid )) != NULL) {
+        my_putstr(" ");
+        my_putstr(gp->gr_name);
+    }
+    a = st.st_size;
+    my_putstr(" ");
+    my_put_nbr(a);
+    hours = ctime(&st.st_mtime);
+    my_putstrdate(hours);
+    my_putstr(" ");
+    my_putstr(f_word);
+    my_putstr("\n");
+}
 
+int right(struct stat st, int i)
+{
     (S_ISDIR(st.st_mode)) ? my_putstr("d") : my_putstr("-");
     (st.st_mode & S_IRUSR) ? my_putstr("r") : my_putstr("-");
     (st.st_mode & S_IWUSR) ? my_putstr("w") : my_putstr("-");
@@ -262,31 +278,13 @@ int displayl(struct stat st, struct passwd *pw, struct group *gp, char * f_word 
     (st.st_mode & S_IROTH) ? my_putstr("r") : my_putstr("-");
     (st.st_mode & S_IWOTH) ? my_putstr("w") : my_putstr("-");
     (st.st_mode & S_IXOTH) ? my_putstr("x. ") : my_putstr("-. ");
-
     i = st.st_nlink;
     my_put_nbr(i);
     my_putstr(" ");
-
-    if ((pw = getpwuid(st.st_uid)) != NULL)
-        my_putstr(pw->pw_name);
-    if ((gp = getgrgid(st.st_gid )) != NULL) {
-        my_putstr(" ");
-        my_putstr(gp->gr_name);
-    }
-
-    a = st.st_size;
-    my_putstr(" ");
-    my_put_nbr(a);
-
-    hours = ctime(&st.st_mtime);
-    my_putstrdate(hours);
-    my_putstr(" ");
-    
-    my_putstr(f_word);
-    my_putstr("\n");
 }
 
-int my_tt(char *str) {
+int my_tt(char *str) 
+{
     DIR *dir;
     struct dirent *dp;
     char * file_name;
