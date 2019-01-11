@@ -136,7 +136,6 @@ int my_l(char *str, char *f_word) {
     if(S_ISDIR(st.st_mode)) {
         dir = opendir(f_word);
         dir2 = opendir(f_word);
-        printf("f-word => %s", f_word);
     }
     else {
         dir = opendir(".");
@@ -151,7 +150,7 @@ int my_l(char *str, char *f_word) {
     }
     blocks = blocks / 2;
     closedir(dir2);
-    if (f_word[0] != '-') {
+    if (f_word[0] != '-' && S_ISREG(st.st_mode)) {
         displayl(st, pw, gp, f_word);
     }
     else {
