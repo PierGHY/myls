@@ -26,5 +26,6 @@ int my_r(char *str, char *f_word);
 int my_tt(char *str);
 int displayl(struct stat st, struct passwd *pw, struct group *gp, char *f_word);
 int tri(struct dirent *dp, char *file_name, DIR *dir);
-
+int right(struct stat st, int i);
+int term_disp(struct dirent *dp, char * file_name,DIR * dir);
 #endif

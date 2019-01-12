@@ -5,7 +5,9 @@
 ## a
 ##
 
-SRC     =   myls.c 
+SRC     =   myls.c \
+            lib.c \
+			myls2.c
 
 OBJ	=	$(SRC:.c=.o)
 
