@@ -18,7 +18,7 @@ int my_put_nbr(int nb)
     int nbcpy = nb;
     int lon = 0;
 
-    while( nbcpy > 9) {
+    while (nbcpy > 9) {
         pow = pow * 10;
         nbcpy = nbcpy / 10;
         lon = lon + 1;
@@ -45,7 +45,7 @@ void my_putstr(char const *str)
 int my_strlen(char const *str)
 {
     int i = 0;
-    while(str[i] != '\0')
+    while (str[i] != '\0')
         i = i + 1;
     return (i);
 }

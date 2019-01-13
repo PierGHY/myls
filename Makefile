@@ -7,7 +7,8 @@
 
 SRC     =   myls.c \
             lib.c \
-			myls2.c
+			myls2.c \
+			myls3.c
 
 OBJ	=	$(SRC:.c=.o)
 
